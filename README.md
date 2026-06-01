@@ -13,6 +13,7 @@ El desempeño general durante el periodo analizado muestra un crecimiento modera
 * **Energía Facturada:** **4,462.7 GWh**, lo que representa una **caída del -2.71%** en volumen de energía entregada en relación con el año anterior.
 * **Disponibilidad del Servicio (ASAI):** Se mantiene estable y robusta en **95.4%** (0% de variación).
 
+![Dashboard_performance](Reporte-Edesur.png)
 ---
 
 ## 2. Diagnóstico del Problema Crítico
