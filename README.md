@@ -14,6 +14,7 @@ El desempeño general durante el periodo analizado muestra un crecimiento modera
 * **Disponibilidad del Servicio (ASAI):** Se mantiene estable y robusta en **95.4%** (0% de variación).
 
 ![Dashboard_performance](Reporte-Edesur.png)
+<img src="Reporte-Edesur.png" alt="Dasbboard_performance" width="500"/>
 ---
 
 ## 2. Diagnóstico del Problema Crítico
