@@ -1,0 +1,187 @@
+createOrReplace
+
+	ref table _Medidas
+
+		measure '% Contratos Telemedidos' = ```
+				
+				    DIVIDE(
+				        [Contratos Telemedidos Facturados],
+				        [Contratos Facturados],0)
+				```
+			formatString: 0.00%;-0.00%;0.00%
+			displayFolder: Facturación
+
+		/// Eficiencia de cobro del mismo periodo del año anterior.
+		measure '% Eficiencia de Cobro Año Anterior' = CALCULATE([Eficiencia de Cobro], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: Cobros
+
+		measure '% Eficiencia de Cobros' =
+				
+				DIVIDE(
+				    [Cobros RD$ MM],
+				    [Facturación RD$ MM]
+				)
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: Cobros
+
+		/// Porcentaje de pérdidas de energía respecto a la energía entregada. Indica la eficiencia del sistema de distribución. Lógica DAX: Divide las pérdidas entre la energía entregada usando DIVIDE para evitar errores de división por cero.
+		measure '% Pérdidas' = DIVIDE([Pérdida GWh], [Energía Entregada GWh], 0)
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: Pérdidas
+
+		/// Porcentaje de pérdidas en el mismo periodo del año anterior.
+		measure '% Pérdidas Año Anterior' = CALCULATE([% Pérdidas], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: Pérdidas
+
+		/// Suma total de cobros realizados en millones de pesos dominicanos desde tabla consolidada.
+		measure 'Cobros RD$ MM' = SUM('Facturacion/Cobros RD$ MMMM'[COBROS (RD$ MM MM)])
+			formatString: #,##0.00
+			displayFolder: Cobros
+
+		/// Total de cobros en el mismo periodo del año anterior.
+		measure 'Cobros RD$ MM Año Anterior' = CALCULATE([Cobros RD$ MM], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			displayFolder: Cobros
+
+		/// Color de alerta/precaución: Amarillo (#FFC000).
+		measure Color_Alerta_Amarillo = "#FFC000"
+			displayFolder: Formato - Paleta Corporativa
+
+		/// Color corporativo EDESUR primario: Azul (#003DA5).
+		measure Color_EDESUR_Azul_Primario = "#003DA5"
+			displayFolder: Formato - Paleta Corporativa
+
+		/// Color para valores negativos: Naranja/Marrón (#C55A11).
+		measure Color_Negativo_Naranja = "#C55A11"
+			displayFolder: Formato - Paleta Corporativa
+
+		/// Color neutro para sin cambio: Gris (#808080).
+		measure Color_Neutro_Gris = "#808080"
+			displayFolder: Formato - Paleta Corporativa
+			lineageTag: 76c336e3-be3c-49c7-b3f5-c14f0e38bd2d
+
+		/// Color para valores positivos: Verde (#00B050).
+		measure Color_Positivo_Verde = "#00B050"
+			displayFolder: Formato - Paleta Corporativa
+			lineageTag: 564dc449-8b89-46be-9092-d1f7d3ea1b66
+
+		measure 'Contratos Facturados' = SUM('Facturacion/Cobros RD$ MMMM'[Contratos Facturados])
+			formatString: #,0
+			displayFolder: Facturación
+
+		/// Total de contratos facturados en el mismo periodo del año anterior.
+		measure 'Contratos Facturados Año Anterior' = CALCULATE([Total Contratos Facturados], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			displayFolder: Facturación
+
+		measure 'Contratos Telemedidos Facturados' = SUM('Facturacion/Cobros RD$ MMMM'[CONTRATOS TELEMEDIDOS  FACTURADOS])
+			displayFolder: Facturación
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		/// Porcentaje de eficiencia de cobro, comparando lo cobrado versus lo facturado. Un 100% indica que se cobró todo lo facturado. Lógica DAX: Divide los cobros entre la facturación para obtener el porcentaje de recuperación.
+		measure 'Eficiencia de Cobro' = DIVIDE([Cobros RD$ MM], [Facturación RD$ MM], 0)
+			formatString: 0.00%
+			displayFolder: Rendimiento
+
+		/// Suma total de energía entregada en GWh desde tabla consolidada.
+		measure 'Energía Entregada GWh' = SUM('Facturacion/Cobros RD$ MMMM'[ENERGIA ENTREGADA GWh])
+			formatString: #,##0.00
+			displayFolder: Energía Entregada
+
+		/// Total de energía entregada en GWh del mismo periodo del año anterior.
+		measure 'Energía Entregada GWh Año Anterior' = CALCULATE([Energía Entregada GWh], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			displayFolder: Energía Entregada
+
+		/// Suma total de facturación en GWh desde tabla consolidada.
+		measure 'Facturación GWh' = SUM('Facturacion/Cobros RD$ MMMM'[FACTURACION (GWH)])
+			formatString: 0.0
+			displayFolder: Facturación
+
+		/// Total de facturación en GWh del mismo periodo del año anterior.
+		measure 'Facturación GWh Año Anterior' = CALCULATE([Facturación GWh], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			displayFolder: Facturación
+
+		/// Suma total de facturación en millones de pesos dominicanos desde tabla consolidada.
+		measure 'Facturación RD$ MM' = SUM('Facturacion/Cobros RD$ MMMM'[FACTURACION (RD$ MM MM)])
+			formatString: #,0
+			displayFolder: Facturación
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		/// Total de facturación en el mismo periodo del año anterior.
+		measure 'Facturación RD$ MM Año Anterior' = CALCULATE([Facturación RD$ MM], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			formatString: 0
+			displayFolder: Facturación
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		/// Color para % de Pérdidas: Verde (#00B050) <10%, Amarillo (#FFC000) 10-15%, Rojo (#C55A11) >15%.
+		measure 'FC_Color_% Pérdidas' =
+				VAR PctPerdidas = [% Pérdidas]
+				RETURN
+				IF(PctPerdidas < 0.1, "#00B050", IF(PctPerdidas <= 0.15, "#FFC000", "#C55A11"))
+			displayFolder: Formato - Condicional
+
+		/// Color: Verde (#00B050) ≥90%, Amarillo (#FFC000) 80-89%, Rojo (#C55A11) <80%.
+		measure FC_Color_Eficiencia_Cobro =
+				VAR Eficiencia = [Eficiencia de Cobro]
+				RETURN
+				IF(Eficiencia >= 0.9, "#00B050", IF(Eficiencia >= 0.8, "#FFC000", "#C55A11"))
+			displayFolder: Formato - Condicional
+
+		/// Color condicional para variaciones de cobros: Verde si positivo, Rojo si negativo.
+		measure FC_Color_Variacion_Cobros =
+				VAR Variacion = [Total Cobros RD$ MM YTD] - [Total Cobros RD$ MM Año Anterior]
+				RETURN
+				IF(Variacion > 0, "#00B050", IF(Variacion < 0, "#C55A11", "#808080"))
+			displayFolder: Formato - Condicional
+
+		/// Suma total de pérdidas en GWh desde tabla consolidada.
+		measure 'Pérdida GWh' = SUM('Facturacion/Cobros RD$ MMMM'[PERDIDA GWh])
+			formatString: #,##0.00
+			displayFolder: Pérdidas
+
+		/// Total de pérdidas en GWh del mismo periodo del año anterior.
+		measure 'Pérdida GWh Año Anterior' = CALCULATE([Pérdida GWh], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			displayFolder: Pérdidas
+
+		/// Promedio de facturación por contrato en el mismo periodo del año anterior.
+		measure 'Promedio Facturación por Contrato Año Anterior' = CALCULATE([Promedio Facturación por Contrato RD$ MM], SAMEPERIODLASTYEAR('Calendario'[Fecha]))
+			displayFolder: Facturación
+
+		measure 'Promedio Facturación por Contrato GWh' = DIVIDE([Facturación GWh], [Total Contratos Facturados], 0)
+			displayFolder: Facturación
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		/// Promedio de facturación por contrato en millones de RD$ MM. Indica cuánto se factura en promedio por cliente. Lógica DAX: Divide la facturación total entre el número de contratos para obtener el promedio.
+		measure 'Promedio Facturación por Contrato RD$ MM' = DIVIDE([Facturación RD$ MM], [Total Contratos Facturados], 0)
+			formatString: #,##0.00
+			displayFolder: Rendimiento
+
+		/// Promedio de cobros de los últimos 3 meses desde tabla consolidada.
+		measure 'Promedio Móvil 3 Meses Cobros RD$ MM' = AVERAGEX(DATESINPERIOD('Calendario'[Fecha], MAX('Calendario'[Fecha]), -3, MONTH), [Cobros RD$ MM])
+			formatString: #,##0.00
+			displayFolder: Cobros
+
+		/// Promedio de facturación de los últimos 3 meses desde tabla consolidada.
+		measure 'Promedio Móvil 3 Meses Facturación RD$ MM' = AVERAGEX(DATESINPERIOD('Calendario'[Fecha], MAX('Calendario'[Fecha]), -3, MONTH), [Facturación RD$ MM])
+			formatString: #,##0.00
+			displayFolder: Facturación
+
+		/// Suma total de contratos facturados. Representa el número total de clientes que recibieron factura en el período. Lógica DAX: Suma la cantidad de contratos facturados.
+		measure 'Total Contratos Facturados' = SUM('Contratos_Facturados'[Contratos Facturados])
+			formatString: #,##0
+			displayFolder: Rendimiento
+
+		measure 'Total Facturado no Cobrado RD$ MM' = [Facturación RD$ MM] - [Cobros RD$ MM]
+			displayFolder: Cobros
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Total Facturado no Cobrado RD$ MM Año Anterior' = CALCULATE([Total Facturado no Cobrado RD$ MM], SAMEPERIODLASTYEAR('Calendario'[Fecha]))*-1
+			displayFolder: Cobros
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
